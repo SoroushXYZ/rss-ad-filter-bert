@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labeling Complete - Advertisement Detection</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .completion-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .stat-item {
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .advertisements { color: #f44336; }
+        .news { color: #4CAF50; }
+        .total { color: #2196F3; }
+        
+        .file-info {
+            background-color: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+            margin: 10px;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: #1976D2;
+        }
+        
+        .next-steps {
+            background-color: #fff3e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            text-align: left;
+        }
+        
+        .next-steps h3 {
+            color: #f57c00;
+            margin-top: 0;
+        }
+        
+        .next-steps ul {
+            color: #666;
+        }
+        
+        .next-steps li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="completion-card">
+        <div class="success-icon">🎉</div>
+        <h1>Labeling Complete!</h1>
+        <p>You have successfully labeled all articles in the dataset.</p>
+        
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number advertisements">{{ stats.advertisements }}</div>
+                <div class="stat-label">Advertisements</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number news">{{ stats.news }}</div>
+                <div class="stat-label">News Articles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number total">{{ stats.labeled_count }}</div>
+                <div class="stat-label">Total Labeled</div>
+            </div>
+        </div>
+        
+        <div class="file-info">
+            <h3>📁 Labels Saved</h3>
+            <p><strong>File:</strong> {{ stats.labels_file }}</p>
+            <p><strong>Total Articles:</strong> {{ stats.total_articles }}</p>
+            <p><strong>Labeling Rate:</strong> {{ "%.1f"|format((stats.labeled_count / stats.total_articles) * 100) }}%</p>
+        </div>
+        
+        <div class="next-steps">
+            <h3>🚀 Next Steps</h3>
+            <ul>
+                <li><strong>Create training dataset:</strong> Combine articles with labels for BERT training</li>
+                <li><strong>Data preprocessing:</strong> Clean and tokenize the text data</li>
+                <li><strong>Model training:</strong> Fine-tune BERT for advertisement classification</li>
+                <li><strong>Model evaluation:</strong> Test accuracy and performance</li>
+                <li><strong>Deploy model:</strong> Set up inference pipeline</li>
+            </ul>
+        </div>
+        
+        <a href="/" class="btn">🔄 Start New Labeling Session</a>
+        <a href="/stats" class="btn">📊 View Detailed Statistics</a>
+    </div>
+</body>
+</html>

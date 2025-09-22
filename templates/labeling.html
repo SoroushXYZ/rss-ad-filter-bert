@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Article Labeling - Advertisement Detection</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            width: {{ progress }}%;
+            transition: width 0.3s ease;
+        }
+        
+        .article-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .article-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+        
+        .article-meta {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        .article-description {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #444;
+            margin-bottom: 25px;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+        
+        .btn-advertisement {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .btn-advertisement:hover {
+            background-color: #d32f2f;
+            transform: translateY(-2px);
+        }
+        
+        .btn-news {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .btn-news:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .btn-skip {
+            background-color: #ff9800;
+            color: white;
+        }
+        
+        .btn-skip:hover {
+            background-color: #f57c00;
+            transform: translateY(-2px);
+        }
+        
+        .stats {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .keyboard-hint {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+        
+        .source-badge {
+            display: inline-block;
+            background-color: #2196F3;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 Article Labeling for Advertisement Detection</h1>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+        <p><strong>Progress:</strong> {{ current_index }} of {{ total_articles }} articles ({{ "%.1f"|format(progress) }}%)</p>
+    </div>
+
+    <div class="article-card">
+        <div class="source-badge">{{ article.source }}</div>
+        <div class="article-title">{{ article.title }}</div>
+        
+        <div class="article-meta">
+            <strong>Published:</strong> {{ article.published }}<br>
+            <strong>Source:</strong> {{ article.source }}
+        </div>
+        
+        {% if article.description %}
+        <div class="article-description">
+            {{ article.description[:500] }}{% if article.description|length > 500 %}...{% endif %}
+        </div>
+        {% endif %}
+        
+        <div class="action-buttons">
+            <button class="btn btn-advertisement" onclick="labelArticle('advertisement')">
+                🛍️ Advertisement
+            </button>
+            <button class="btn btn-news" onclick="labelArticle('news')">
+                📰 News
+            </button>
+            <button class="btn btn-skip" onclick="skipArticle()">
+                ⏭️ Skip
+            </button>
+        </div>
+    </div>
+
+    <div class="stats">
+        <h3>Labeling Statistics</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" id="ads-count">0</div>
+                <div class="stat-label">Advertisements</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="news-count">0</div>
+                <div class="stat-label">News Articles</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="total-labeled">0</div>
+                <div class="stat-label">Total Labeled</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="keyboard-hint">
+        <p>💡 <strong>Keyboard shortcuts:</strong> Press <kbd>1</kbd> for Advertisement, <kbd>2</kbd> for News, <kbd>S</kbd> to Skip</p>
+    </div>
+
+    <script>
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === '1') {
+                labelArticle('advertisement');
+            } else if (e.key === '2') {
+                labelArticle('news');
+            } else if (e.key.toLowerCase() === 's') {
+                skipArticle();
+            }
+        });
+
+        function labelArticle(label) {
+            fetch('/label', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({label: label})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    updateStats();
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error labeling article. Please try again.');
+            });
+        }
+
+        function skipArticle() {
+            fetch('/skip', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error skipping article. Please try again.');
+            });
+        }
+
+        function updateStats() {
+            fetch('/stats')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('ads-count').textContent = data.advertisements;
+                document.getElementById('news-count').textContent = data.news;
+                document.getElementById('total-labeled').textContent = data.labeled_count;
+            })
+            .catch(error => console.error('Error fetching stats:', error));
+        }
+
+        // Update stats on page load
+        updateStats();
+    </script>
+</body>
+</html>
