@@ -39,8 +39,7 @@ ENV/
 .ipynb_checkpoints
 
 # Data files
-data/raw/
-data/processed/
+data/
 *.csv
 *.json
 *.pkl
@@ -63,3 +62,6 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Hugging Face
+.cache/
