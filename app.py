@@ -29,6 +29,31 @@ def load_latest_articles():
     print(f"Loaded {len(articles)} articles from {latest_file}")
     return True
 
+def load_latest_labels():
+    """Load the most recent labels JSON file and return progress"""
+    global labels, current_index
+    data_dir = 'data'
+    label_files = glob.glob(os.path.join(data_dir, 'labels_*.json'))
+    
+    if not label_files:
+        return False
+    
+    # Get the most recent labels file
+    latest_labels_file = max(label_files, key=os.path.getctime)
+    
+    with open(latest_labels_file, 'r', encoding='utf-8') as f:
+        label_data = json.load(f)
+    
+    labels = label_data.get('labels', {})
+    # Set current index to the next unlabeled article
+    current_index = len(labels)
+    
+    print(f"Resumed labeling from {latest_labels_file}")
+    print(f"Previously labeled: {len(labels)} articles")
+    print(f"Resuming from article index: {current_index}")
+    
+    return True
+
 def save_labels():
     """Save current labels to a JSON file"""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -56,17 +81,27 @@ def index():
         if not load_latest_articles():
             return "No articles found. Please run the data collection notebook first."
     
+    # Try to load existing labels to resume progress
+    if not labels:
+        load_latest_labels()
+    
     if current_index >= len(articles):
         return redirect(url_for('completed'))
     
     article = articles[current_index]
     progress = (current_index / len(articles)) * 100
     
+    # Show resume message if we loaded existing labels
+    resume_message = ""
+    if len(labels) > 0 and current_index > 0:
+        resume_message = f"Resumed from article {current_index + 1} (previously labeled {len(labels)} articles)"
+    
     return render_template('labeling.html', 
                          article=article, 
                          current_index=current_index + 1,
                          total_articles=len(articles),
-                         progress=progress)
+                         progress=progress,
+                         resume_message=resume_message)
 
 @app.route('/label', methods=['POST'])
 def label_article():
@@ -126,6 +161,7 @@ def stats():
     return jsonify(stats)
 
 if __name__ == '__main__':
-    # Load articles on startup
+    # Load articles and existing labels on startup
     load_latest_articles()
+    load_latest_labels()
     app.run(debug=True, host='0.0.0.0', port=5001)

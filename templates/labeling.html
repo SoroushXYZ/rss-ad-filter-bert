@@ -176,6 +176,11 @@
 <body>
     <div class="header">
         <h1>🎯 Article Labeling for Advertisement Detection</h1>
+        {% if resume_message %}
+        <div style="background-color: #e8f5e8; padding: 10px; border-radius: 5px; margin-bottom: 10px; border-left: 4px solid #4CAF50;">
+            <strong>✅ {{ resume_message }}</strong>
+        </div>
+        {% endif %}
         <div class="progress-bar">
             <div class="progress-fill"></div>
         </div>
@@ -229,18 +234,56 @@
     </div>
 
     <div class="keyboard-hint">
-        <p>💡 <strong>Keyboard shortcuts:</strong> Press <kbd>1</kbd> for Advertisement, <kbd>2</kbd> for News, <kbd>S</kbd> to Skip</p>
+        <p>💡 <strong>Keyboard shortcuts:</strong> 
+        <kbd>1</kbd> or <kbd>A</kbd> = Advertisement | 
+        <kbd>2</kbd> or <kbd>N</kbd> = News | 
+        <kbd>S</kbd> = Skip | 
+        <kbd>←</kbd> = Previous | 
+        <kbd>→</kbd> = Next</p>
+        <p style="margin-top: 10px; font-size: 14px; color: #888;">
+        ⚡ <strong>Quick tip:</strong> Just press any key to label instantly - no clicking needed!</p>
     </div>
 
     <script>
-        // Keyboard shortcuts
+        // Prevent page reload on Enter key
         document.addEventListener('keydown', function(e) {
-            if (e.key === '1') {
-                labelArticle('advertisement');
-            } else if (e.key === '2') {
-                labelArticle('news');
-            } else if (e.key.toLowerCase() === 's') {
-                skipArticle();
+            if (e.key === 'Enter') {
+                e.preventDefault();
+            }
+        });
+
+        // Enhanced keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Prevent default behavior for our shortcuts
+            if (['1', '2', 's', 'S', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+
+            switch(e.key) {
+                case '1':
+                    labelArticle('advertisement');
+                    break;
+                case '2':
+                    labelArticle('news');
+                    break;
+                case 's':
+                case 'S':
+                    skipArticle();
+                    break;
+                case 'ArrowLeft':
+                    goToPrevious();
+                    break;
+                case 'ArrowRight':
+                    skipArticle(); // Same as skip for now
+                    break;
+                case 'a':
+                case 'A':
+                    labelArticle('advertisement');
+                    break;
+                case 'n':
+                case 'N':
+                    labelArticle('news');
+                    break;
             }
         });
 
@@ -284,6 +327,12 @@
             });
         }
 
+        function goToPrevious() {
+            // For now, just reload the page to go back to previous article
+            // In a more advanced version, we could implement proper navigation
+            window.location.reload();
+        }
+
         function updateStats() {
             fetch('/stats')
             .then(response => response.json())
@@ -294,6 +343,51 @@
             })
             .catch(error => console.error('Error fetching stats:', error));
         }
+
+        // Add visual feedback for key presses
+        function showKeyFeedback(key) {
+            const feedback = document.createElement('div');
+            feedback.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 20px 40px;
+                border-radius: 10px;
+                font-size: 24px;
+                font-weight: bold;
+                z-index: 1000;
+                pointer-events: none;
+            `;
+            
+            const labels = {
+                '1': '🛍️ ADVERTISEMENT',
+                '2': '📰 NEWS',
+                's': '⏭️ SKIP',
+                'S': '⏭️ SKIP',
+                'a': '🛍️ ADVERTISEMENT',
+                'A': '🛍️ ADVERTISEMENT',
+                'n': '📰 NEWS',
+                'N': '📰 NEWS'
+            };
+            
+            feedback.textContent = labels[key] || `Key: ${key}`;
+            document.body.appendChild(feedback);
+            
+            setTimeout(() => {
+                document.body.removeChild(feedback);
+            }, 500);
+        }
+
+        // Update the keyboard handler to show feedback
+        document.addEventListener('keydown', function(e) {
+            // Show visual feedback for key presses
+            if (['1', '2', 's', 'S', 'a', 'A', 'n', 'N'].includes(e.key)) {
+                showKeyFeedback(e.key);
+            }
+        });
 
         // Update stats on page load
         updateStats();
