@@ -10,6 +10,24 @@ This project provides a complete pipeline for:
 3. **Training a DistilBERT model** for advertisement classification
 4. **Publishing the model** to Hugging Face Hub
 
+## 🤗 Live Model
+
+**Ready to use!** The trained model is available on Hugging Face Hub:
+
+**🔗 [SoroushXYZ/distilbert-rss-ad-detection](https://huggingface.co/SoroushXYZ/distilbert-rss-ad-detection)**
+
+```python
+from transformers import pipeline
+
+# Load the model
+classifier = pipeline("text-classification", 
+                     model="SoroushXYZ/distilbert-rss-ad-detection")
+
+# Classify a title
+result = classifier("50% OFF - Limited Time Offer on Premium Headphones!")
+print(result)  # [{'label': 'advertisement', 'score': 0.95}]
+```
+
 ## 🚀 Features
 
 ### Data Collection
@@ -93,25 +111,6 @@ Then open http://localhost:5001 in your browser.
 Train the DistilBERT model:
 ```bash
 jupyter notebook notebooks/03_train_distilbert.ipynb
-```
-
-## 🤗 Hugging Face Model
-
-The trained model is available on Hugging Face Hub:
-
-**Model Card**: [SoroushXYZ/distilbert-rss-ad-detection](https://huggingface.co/SoroushXYZ/distilbert-rss-ad-detection)
-
-### Usage Example
-```python
-from transformers import pipeline
-
-# Load the model
-classifier = pipeline("text-classification", 
-                     model="SoroushXYZ/distilbert-rss-ad-detection")
-
-# Classify a title
-result = classifier("50% OFF - Limited Time Offer on Premium Headphones!")
-print(result)  # [{'label': 'advertisement', 'score': 0.95}]
 ```
 
 ## 📈 Model Performance
